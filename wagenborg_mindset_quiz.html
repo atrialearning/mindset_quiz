@@ -1,0 +1,214 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mindset Assessment Quiz</title>
+  <style>
+    /* WAGENBORG MINDSET ASSESSMENT */
+    :root {
+      --wg-red: #DF091E;
+      --wg-black: #0E0E10;
+      --wg-grey: #8D969D;
+      --wg-light: #E5E7EA;
+      --wg-muted: #51565B;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      margin: 0;
+      min-height: 100vh;
+      background: #F6F7F8;
+      color: var(--wg-black);
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 28px 16px;
+    }
+    .quiz-container {
+      background: #FFFFFF;
+      border: 1px solid #D4D8DC;
+      border-top: 6px solid var(--wg-red);
+      border-radius: 12px;
+      box-shadow: 0 4px 18px rgba(14,14,16,0.06);
+      padding: 28px;
+      max-width: 650px;
+      width: 100%;
+    }
+    h1, h2 {
+      color: var(--wg-black);
+      text-align: center;
+      line-height: 1.3;
+    }
+    h1 { font-size: 25px; margin: 0 0 22px; }
+    h2 { font-size: 19px; margin: 0 0 18px; }
+    .question { display: none; }
+    .question.active { display: block; }
+    .question > p {
+      font-size: 16px;
+      line-height: 1.65;
+      margin: 0 0 18px;
+      color: var(--wg-black);
+    }
+    .answers label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 9px 0;
+      padding: 13px 15px;
+      border: 1px solid #D4D8DC;
+      border-radius: 8px;
+      background: #FFFFFF;
+      color: var(--wg-black);
+      cursor: pointer;
+      font-size: 14px;
+      line-height: 1.45;
+    }
+    .answers label:hover { background: #FFF4F5; border-color: var(--wg-red); }
+    .answers label:has(input:checked) { background: #FFF4F5; border-color: var(--wg-red); }
+    .answers input[type="radio"] {
+      accent-color: var(--wg-red);
+      width: 17px;
+      height: 17px;
+      margin: 0;
+      flex-shrink: 0;
+    }
+    .btn {
+      display: block;
+      width: 100%;
+      background: var(--wg-red);
+      color: #FFFFFF;
+      border: none;
+      padding: 13px 18px;
+      margin-top: 22px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      font-family: inherit;
+      font-weight: 700;
+    }
+    .btn:hover { background: #B80719; }
+    .btn:focus-visible, .answers input:focus-visible {
+      outline: 3px solid var(--wg-grey);
+      outline-offset: 3px;
+    }
+    .result { text-align: center; color: var(--wg-black); line-height: 1.65; }
+    .result h2 { color: var(--wg-red); }
+    .result p { font-size: 15px; color: var(--wg-muted); }
+    .result strong { color: var(--wg-black); }
+    @media(max-width: 520px) {
+      body { padding: 12px; }
+      .quiz-container { padding: 20px 16px; }
+      h1 { font-size: 22px; }
+      h2 { font-size: 18px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="quiz-container">
+    <h1>Mindset Assessment</h1>
+    <form id="quiz-form"></form>
+    <div class="result" id="result" style="display:none;"></div>
+  </div>
+
+  <script>
+    const questions = [
+      { q: "I believe that intelligence is largely inborn and cannot be changed very much.", key: 1, type: "fixed" },
+      { q: "No matter what kind of person you are, it's always possible to make major changes for the better.", key: 2, type: "growth" },
+      { q: "I believe it's possible to substantially increase how intelligent you are.", key: 3, type: "growth" },
+      { q: "I don't think people can change who they truly are at their core.", key: 4, type: "fixed" },
+      { q: "It is always possible to change the basic things about the kind of person you are.", key: 5, type: "growth" },
+      { q: "I think musical ability is something anyone can learn.", key: 6, type: "growth" },
+      { q: "Talent is something you are born with, not something you can develop.", key: 7, type: "fixed" },
+      { q: "I believe math is much easier to learn if you are male or come from a culture that values math.", key: 8, type: "fixed" },
+      { q: "If I stay focused, work hard and smart, I can become the best at a skill regardless of natural ability.", key: 9, type: "growth" },
+      { q: "No matter what kind of person you are, you can always change substantially.", key: 10, type: "growth" },
+      { q: "Trying new things is stressful for me, so I avoid it.", key: 11, type: "fixed" },
+      { q: "Some people are good and kind, some aren’t. They rarely change.", key: 12, type: "fixed" },
+      { q: "I value it when coaches or coworkers give me feedback, even if it's negative.", key: 13, type: "growth" },
+      { q: "Because I have high standards, I dislike criticism about my performance.", key: 14, type: "fixed" },
+      { q: "All people (without injuries or defects) are capable of the same amount of learning.", key: 15, type: "growth" },
+      { q: "You can learn new things, but it won’t change how intelligent you are.", key: 16, type: "fixed" },
+      { q: "The really important parts of who you are—your talents and skills—can’t be changed.", key: 17, type: "fixed" },
+      { q: "People are fundamentally good but sometimes make terrible choices.", key: 18, type: "growth" },
+      { q: "I study because I enjoy learning and gaining skills.", key: 19, type: "growth" },
+      { q: "Some people are born smart and don’t need to work hard.", key: 20, type: "fixed" }
+    ];
+
+    const answerOptions = [
+      { text: "Strongly disagree", value: 3 },
+      { text: "Disagree", value: 2 },
+      { text: "Agree", value: 1 },
+      { text: "Strongly agree", value: 0 }
+    ];
+
+    const form = document.getElementById("quiz-form");
+    let current = 0;
+    let score = 0;
+
+    function renderQuestion() {
+      form.innerHTML = "";
+      const q = questions[current];
+      const qDiv = document.createElement("div");
+      qDiv.className = "question active";
+      qDiv.innerHTML = `<h2>Question ${current + 1}</h2><p>${q.q}</p>`;
+
+      const ansDiv = document.createElement("div");
+      ansDiv.className = "answers";
+
+      answerOptions.forEach((opt, i) => {
+        const scoreValue = q.type === "growth" ? opt.value : 3 - opt.value;
+        ansDiv.innerHTML += `
+          <label>
+            <input type="radio" name="q${q.key}" value="${scoreValue}" />
+            ${opt.text}
+          </label>`;
+      });
+
+      qDiv.appendChild(ansDiv);
+
+      const nextBtn = document.createElement("button");
+      nextBtn.type = "button";
+      nextBtn.className = "btn";
+      nextBtn.textContent = current < questions.length - 1 ? "Next" : "See Result";
+      nextBtn.onclick = () => {
+        const selected = form.querySelector("input[name='q" + q.key + "']:checked");
+        if (!selected) {
+          alert("Please select an answer before proceeding.");
+          return;
+        }
+        score += parseInt(selected.value);
+        current++;
+        if (current < questions.length) {
+          renderQuestion();
+        } else {
+          showResult();
+        }
+      };
+
+      qDiv.appendChild(nextBtn);
+      form.appendChild(qDiv);
+    }
+
+    function showResult() {
+      form.style.display = "none";
+      const resultDiv = document.getElementById("result");
+      resultDiv.style.display = "block";
+
+      let resultText = "";
+      if (score >= 45) {
+        resultText = `<h2>🌱 Growth Mindset</h2><p>You believe in learning, effort, and change. Keep growing!</p>`;
+      } else if (score >= 30) {
+        resultText = `<h2>🔄 Mixed Mindset</h2><p>You show growth potential, but may hold some limiting beliefs. Reflect and build confidence in your ability to grow.</p>`;
+      } else {
+        resultText = `<h2>🔒 Fixed Mindset</h2><p>You may believe abilities are static. With awareness, you can shift toward a more empowering mindset.</p>`;
+      }
+
+      resultDiv.innerHTML = `<h1>Your Result</h1><p><strong>Score:</strong> ${score}/60</p>${resultText}`;
+    }
+
+    renderQuestion();
+  </script>
+</body>
+</html>
